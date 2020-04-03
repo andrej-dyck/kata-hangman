@@ -1,10 +1,18 @@
 language: java
 sudo: false
+jdk:
+  - openjdk11
+
+before_install:
+  - chmod +x gradlew
+
+script: ./gradlew check --info --stacktrace --console=plain --max-workers=1 --no-daemon --build-cache -Dkotlin.colors.enabled=false
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
-    - $HOME/.m2
-script:
-  - set -e
-  - mvn clean package --errors --batch-mode
-jdk:
-  - oraclejdk8
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/

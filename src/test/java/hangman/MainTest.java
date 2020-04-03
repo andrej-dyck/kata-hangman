@@ -14,11 +14,12 @@
  */
 package hangman;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class MainTest {
 
@@ -29,7 +30,6 @@ public final class MainTest {
         );
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         new Main(input, output, 1).exec();
-        assertThat(output.toString(), containsString("You lost"));
+        assertThat(output.toString()).contains("You lost");
     }
-
 }
