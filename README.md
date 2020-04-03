@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/yegor256/hangman/master/images/logo.png" width="100px"/>
 
-[![Build Status](https://img.shields.io/travis/yegor256/hangman/master.svg)](https://travis-ci.org/yegor256/hangman)
+[![Build Status](https://travis-ci.com/andrej-dyck/kata-hangman.svg?branch=master)](https://travis-ci.com/github/andrej-dyck/kata-hangman)
 
 [Hangman](https://en.wikipedia.org/wiki/Hangman_%28game%29) is a words
 guessing game for one player. The computer guesses a word and the user
@@ -10,16 +10,22 @@ word doesn't contain a letter, the computer gives a penalty point for
 the user. If there are five penalty points, the user looses. If there
 are no hidden letters anymore, the computer looses.
 
-First, build it:
+Build it:
 
 ```
-$ mvn clean package
+$ ./gradlew build
 ```
 
-Then, run:
+Test it:
 
 ```
-$ java -classpath target/classes hangman.Main
+$ ./gradlew check
+```
+
+Run it:
+
+```
+$ ./gradlew run
 ```
 
 ## It is not object-oriented
