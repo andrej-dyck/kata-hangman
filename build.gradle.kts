@@ -24,6 +24,14 @@ configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_10
 }
 
+sourceSets.getByName("main") {
+    java.srcDirs("src/")
+}
+
+sourceSets.getByName("test") {
+    java.srcDirs("test/")
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform {
         includeEngines("junit-jupiter")
@@ -36,7 +44,7 @@ tasks.named<Test>("test") {
 
 application {
     applicationName = "ElegantHangman"
-    mainClassName = "hangman.Main"
+    mainClassName = "ad.kata.hangman.Main"
 }
 
 tasks.withType<Jar> {
