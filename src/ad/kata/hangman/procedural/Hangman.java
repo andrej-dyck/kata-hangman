@@ -12,7 +12,7 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  */
-package ad.kata.hangman;
+package ad.kata.hangman.procedural;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Main {
+public class Hangman {
 
     private final InputStream input;
     private final OutputStream output;
@@ -32,14 +32,10 @@ public class Main {
         "university", "explanation"
     };
 
-    public Main(final InputStream in, final OutputStream out, final int m) {
+    public Hangman(final InputStream in, final OutputStream out, final int m) {
         this.input = in;
         this.output = out;
         this.max = m;
-    }
-
-    public static void main(final String... args) {
-        new Main(System.in, System.out, 5).exec();
     }
 
     public void exec() {
