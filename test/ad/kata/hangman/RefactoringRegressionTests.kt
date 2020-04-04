@@ -2,7 +2,6 @@ package ad.kata.hangman
 
 import ad.kata.hangman.oo.Word
 import ad.kata.hangman.oo.obscured
-import ad.kata.hangman.oo.reveal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
@@ -57,7 +56,7 @@ private fun proceduralExec(word: String, maxMistakes: Int, vararg inputChars: Ch
     ByteArrayOutputStream().use { output ->
         ProceduralHangman(
             ByteArrayInputStream(
-                inputChars.joinToString("") { "$it\n" }.toByteArray()
+                inputChars.toLines(trailingBreak = true).toByteArray()
             ),
             output,
             arrayOf(word),

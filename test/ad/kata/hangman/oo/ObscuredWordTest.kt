@@ -1,5 +1,9 @@
 package ad.kata.hangman.oo
 
+import ad.kata.hangman.contains
+import ad.kata.hangman.isRevealed
+import ad.kata.hangman.length
+import ad.kata.hangman.reveal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -113,5 +117,3 @@ class ObscuredWordTest {
         )
     }
 }
-
-private operator fun Word.contains(char: Char) = char in toString()
