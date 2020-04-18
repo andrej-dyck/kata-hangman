@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 
-class ObscuredWordTest {
+class SecretWordTest {
 
     @ParameterizedTest
     @CsvSource(
@@ -24,13 +24,13 @@ class ObscuredWordTest {
         "objects, x, ???????",
         "objects, st, ?????ts"
     )
-    fun `obscured word reveals all appearances of correctly guessed letters`(
+    fun `secret word reveals all appearances of correctly guessed letters`(
         word: Word,
         guesses: String,
         expectedObscuredWord: Word
     ) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .reveal(visible = guesses.toCharArray())
         ).isEqualTo(
             expectedObscuredWord
@@ -39,9 +39,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "a", "book", "called", "elegant", "objects"])
-    fun `obscured word has the same length as the word`(word: Word) {
+    fun `secret word has the same length as the word`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .length()
         ).isEqualTo(
             word.length()
@@ -50,9 +50,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "a", "book", "called", "elegant", "objects"])
-    fun `obscured word comprises only ? as letters`(word: Word) {
+    fun `secret word comprises only ? as letters`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .reveal()
                 .toString()
         ).matches(
@@ -62,9 +62,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "a", "book", "called", "elegant", "objects"])
-    fun `obscured word reveals word when all its letters are guessed`(word: Word) {
+    fun `secret word reveals word when all its letters are guessed`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .reveal(visible = word.chars().shuffled())
         ).isEqualTo(
             word
@@ -73,9 +73,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "a", "book", "called", "elegant", "objects"])
-    fun `obscured word is still hidden when none of its letters are guessed`(word: Word) {
+    fun `secret word is still hidden when none of its letters are guessed`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .reveal(visible = ('a'..'z').filter { it !in word })
                 .toString()
         ).matches(
@@ -85,9 +85,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["", "a", "book", "called", "elegant", "objects"])
-    fun `obscured word reveals exactly those letters that are guessed correctly`(word: Word) {
+    fun `secret word reveals exactly those letters that are guessed correctly`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .reveal(visible = setOf('a', 'b', 'c'))
                 .toString()
         ).matches(
@@ -97,9 +97,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `obscured word is revealed when at least all letters of the word are guessed`(word: Word) {
+    fun `secret word is revealed when at least all letters of the word are guessed`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .isRevealed(visible = word.chars().shuffled())
         ).isEqualTo(
             true
@@ -108,9 +108,9 @@ class ObscuredWordTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `obscured word is not revealed when at least one letter of the word is not guessed`(word: Word) {
+    fun `secret word is not revealed when at least one letter of the word is not guessed`(word: Word) {
         assertThat(
-            word.obscured()
+            word.toSecret()
                 .isRevealed(visible = word.chars().shuffled().drop(1))
         ).isEqualTo(
             false

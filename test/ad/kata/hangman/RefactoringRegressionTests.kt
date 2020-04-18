@@ -1,7 +1,7 @@
 package ad.kata.hangman
 
 import ad.kata.hangman.oo.Word
-import ad.kata.hangman.oo.obscured
+import ad.kata.hangman.oo.toSecret
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,12 +31,12 @@ class RefactoringRegressionTests {
             "objects, x",
             "objects, st"
         )
-        fun `obscured word is depicted with ?-marks`(
+        fun `secret word is obscures hidden letters with ?-marks`(
             word: Word,
             guesses: String
         ) {
             assertThat(
-                word.obscured()
+                word.toSecret()
                     .reveal(guesses.toCharArray())
                     .toString()
             ).isEqualTo(
