@@ -19,6 +19,8 @@ class PlayerGuesses(private val sequence: Sequence<Char>) : Guesses {
         }
     )
 
+    internal constructor(charSequence: CharSequence) : this(charSequence.asSequence())
+
     override fun iterator() = sequence.iterator()
 }
 

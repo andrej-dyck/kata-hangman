@@ -83,6 +83,6 @@ val run by tasks.getting(JavaExec::class) {
 }
 
 tasks.withType<Wrapper> {
-    gradleVersion = "6.1"
+    gradleVersion = "6.3"
     distributionType = Wrapper.DistributionType.BIN
 }

@@ -1,51 +1,68 @@
 package ad.kata.hangman
 
+import ad.kata.hangman.oo.ComputerHost
+import ad.kata.hangman.oo.PlayerGuesses
 import ad.kata.hangman.oo.Word
 import ad.kata.hangman.oo.toSecret
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.ValueSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import ad.kata.hangman.procedural.Hangman as ProceduralHangman
 
 class RefactoringRegressionTests {
 
-    @Nested
-    inner class ObscuresWordsTheSameWay {
-
-        @ParameterizedTest
-        @CsvSource(
-            "experiment, exv",
-            "hangman, x",
-            "hangman, ax",
-            "a, x",
-            "a, a",
-            "book, o",
-            "book, x",
-            "book, ob",
-            "book, xob",
-            "book, kob",
-            "elegant, e",
-            "objects, x",
-            "objects, st"
+    @ParameterizedTest
+    @CsvSource(
+        "experiment, exv",
+        "hangman, x",
+        "hangman, ax",
+        "a, x",
+        "a, a",
+        "book, o",
+        "book, x",
+        "book, ob",
+        "book, xob",
+        "book, kob",
+        "elegant, e",
+        "objects, x",
+        "objects, st"
+    )
+    fun `secret word obscures hidden letters with ?-marks and reveals all guessed letters`(
+        word: Word,
+        guesses: String
+    ) {
+        assertThat(
+            word.toSecret()
+                .reveal(guesses.toCharArray())
+                .toString()
+        ).isEqualTo(
+            proceduralExec(word.toString(), *guesses.toCharArray())
+                .lines()
+                .last { it.startsWith("The word: ") }
+                .replace("The word: ", "")
         )
-        fun `secret word is obscures hidden letters with ?-marks`(
-            word: Word,
-            guesses: String
-        ) {
-            assertThat(
-                word.toSecret()
-                    .reveal(guesses.toCharArray())
-                    .toString()
-            ).isEqualTo(
-                proceduralExec(word.toString(), *guesses.toCharArray())
-                    .lines()
-                    .last { it.startsWith("The word: ") }
-                    .replace("The word: ", "")
-            )
-        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["hangman", "book", "elegant", "objects"])
+    fun `host reveals secret word after guesses`(word: Word) {
+        val guesses = word.toString().shuffle()
+
+        assertThat(
+            ComputerHost(word)
+                .take(PlayerGuesses(guesses))
+                .drop(1) // in procedural solution, first all-? word isn't shown
+                .map { it.toString() }
+                .toList()
+        ).containsExactlyElementsOf(
+            proceduralExec(word.toString(), *guesses.toCharArray())
+                .lines()
+                .filter { it.startsWith("The word: ") }
+                .map { it.replace("The word: ", "") }
+        )
     }
 }
 

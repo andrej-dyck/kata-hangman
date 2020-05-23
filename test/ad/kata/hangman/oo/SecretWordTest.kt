@@ -1,7 +1,6 @@
 package ad.kata.hangman.oo
 
 import ad.kata.hangman.contains
-import ad.kata.hangman.isRevealed
 import ad.kata.hangman.length
 import ad.kata.hangman.reveal
 import org.assertj.core.api.Assertions.assertThat
@@ -53,7 +52,7 @@ class SecretWordTest {
     fun `secret word comprises only ? as letters`(word: Word) {
         assertThat(
             word.toSecret()
-                .reveal()
+                .asObscuredWord()
                 .toString()
         ).matches(
             "\\?*".toPattern()
