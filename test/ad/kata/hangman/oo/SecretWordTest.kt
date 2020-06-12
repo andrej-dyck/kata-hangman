@@ -64,7 +64,7 @@ class SecretWordTest {
     fun `secret word reveals word when all its letters are guessed`(word: Word) {
         assertThat(
             word.toSecret()
-                .reveal(visible = word.chars().shuffled())
+                .reveal(letters = word.chars().shuffled())
         ).isEqualTo(
             word
         )
@@ -75,7 +75,7 @@ class SecretWordTest {
     fun `secret word is still hidden when none of its letters are guessed`(word: Word) {
         assertThat(
             word.toSecret()
-                .reveal(visible = ('a'..'z').filter { it !in word })
+                .reveal(letters = ('a'..'z').filter { it !in word })
                 .toString()
         ).matches(
             "\\?*".toPattern()
@@ -87,7 +87,7 @@ class SecretWordTest {
     fun `secret word reveals exactly those letters that are guessed correctly`(word: Word) {
         assertThat(
             word.toSecret()
-                .reveal(visible = setOf('a', 'b', 'c'))
+                .reveal(letters = setOf('a', 'b', 'c'))
                 .toString()
         ).matches(
             "[a, b, c, \\?]*".toPattern()
@@ -99,8 +99,8 @@ class SecretWordTest {
     fun `secret word is revealed when at least all letters of the word are guessed`(word: Word) {
         assertThat(
             word.toSecret()
-                .isRevealed(visible = word.chars().shuffled())
-        ).isEqualTo(
+                .isRevealed(letters = word.chars().shuffled())
+        ).`as`("word is revealed").isEqualTo(
             true
         )
     }
@@ -110,9 +110,31 @@ class SecretWordTest {
     fun `secret word is not revealed when at least one letter of the word is not guessed`(word: Word) {
         assertThat(
             word.toSecret()
-                .isRevealed(visible = word.chars().shuffled().drop(1))
-        ).isEqualTo(
+                .isRevealed(letters = word.chars().shuffled().drop(1))
+        ).`as`("word is revealed").isEqualTo(
             false
         )
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
+    fun `each letter of the word is a hit`(word: Word) {
+        word.chars().forEach { letter ->
+            assertThat(
+                word.toSecret().isHit(letter)
+            ).`as`("$letter must be a hit").isTrue()
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
+    fun `each letter that is not one of the word is a miss`(word: Word) {
+        val lettersNotInWord = ('a'..'z') subtract word.chars()
+
+        lettersNotInWord.forEach { letter ->
+            assertThat(
+                word.toSecret().isMiss(letter)
+            ).`as`("$letter must be a miss").isTrue()
+        }
     }
 }
