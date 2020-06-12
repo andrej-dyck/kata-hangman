@@ -2,6 +2,7 @@ package ad.kata.hangman.oo
 
 import ad.kata.hangman.ArrowSeparatedStrings
 import ad.kata.hangman.shuffle
+import ad.kata.hangman.take
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -23,11 +24,11 @@ class ComputerHostTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
     fun `takes guesses until word is revealed`(word: Word) {
-        val letters = word.toString().shuffle()
+        val guesses = word.toString().shuffle()
 
         assertThat(
             ComputerHost(word)
-                .take(Guesses(letters))
+                .take(guesses)
                 .last()
         ).isEqualTo(
             word
@@ -44,7 +45,7 @@ class ComputerHostTest {
     fun `reveals word after each guess`(word: Word, guesses: String, expectedReveals: ArrowSeparatedStrings) {
         assertThat(
             ComputerHost(word)
-                .take(Guesses(guesses))
+                .take(guesses)
                 .map { it.toString() }
                 .toList()
         ).containsExactlyElementsOf(
@@ -56,7 +57,7 @@ class ComputerHostTest {
     fun `with no guesses reveals nothing`() {
         assertThat(
             ComputerHost(Word("something"))
-                .take(Guesses(emptySequence()))
+                .take(guesses = emptySequence())
                 .toList()
         ).isEmpty()
     }

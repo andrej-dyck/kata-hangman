@@ -39,31 +39,37 @@ class RefactoringRegressionTests {
                 .reveal(guesses.toCharArray())
                 .toString()
         ).isEqualTo(
-            proceduralExec(word.toString(), *guesses.toCharArray())
+            proceduralExec(word.toString(), guesses)
                 .lines()
                 .last { it.startsWith("The word: ") }
-                .replace("The word: ", "")
+                .removePrefix("The word: ")
         )
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["hangman", "book", "elegant", "objects"])
     fun `host reveals secret word after guesses`(word: Word) {
-        val guesses = word.toString().shuffle()
+        val guesses = word.toMinimalGuesses()
 
         assertThat(
             ComputerHost(word)
-                .take(Guesses(guesses))
+                .take(guesses)
                 .map { it.toString() }
                 .toList()
         ).containsExactlyElementsOf(
-            proceduralExec(word.toString(), *guesses.toCharArray())
+            proceduralExec(word.toString(), guesses)
                 .lines()
                 .filter { it.startsWith("The word: ") }
-                .map { it.replace("The word: ", "") }
+                .map { it.removePrefix("The word: ") }
         )
     }
 }
+
+private fun proceduralExec(word: String, guesses: Guesses) =
+    proceduralExec(word, Int.MAX_VALUE, *guesses.toList().toCharArray())
+
+private fun proceduralExec(word: String, guesses: String) =
+    proceduralExec(word, Int.MAX_VALUE, *guesses.toCharArray())
 
 private fun proceduralExec(word: String, vararg inputChars: Char) =
     proceduralExec(word, Int.MAX_VALUE, *inputChars)

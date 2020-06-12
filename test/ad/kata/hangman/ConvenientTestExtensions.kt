@@ -1,8 +1,6 @@
 package ad.kata.hangman
 
-import ad.kata.hangman.oo.SecretWord
-import ad.kata.hangman.oo.Word
-import ad.kata.hangman.oo.asObscuredWord
+import ad.kata.hangman.oo.*
 
 /* Strings and Chars */
 
@@ -22,11 +20,23 @@ fun String.shuffle() =
 
 operator fun Word.contains(char: Char) = char in toString()
 
+fun Word.toMinimalGuesses() = Guesses(
+    chars().shuffled().asSequence()
+)
+
 /* Secret Word */
 
 fun SecretWord.reveal(visible: CharArray) = reveal(visible.toHashSet())
 
 fun SecretWord.length() = asObscuredWord().length()
+
+/* Host */
+
+fun Host.take(guesses: CharSequence) =
+    take(guesses.asSequence())
+
+fun Host.take(guesses: Sequence<Char>) =
+    take(Guesses(guesses))
 
 /* Parameterized Test Arguments */
 

@@ -13,8 +13,6 @@ class Guesses(private val sequence: Sequence<Char>) : Sequence<Char> {
 
     constructor(inputStream: InputStream) : this(Scanner(inputStream))
 
-    internal constructor(charSequence: CharSequence) : this(charSequence.asSequence())
-
     override fun iterator() = sequence.iterator()
 }
 
