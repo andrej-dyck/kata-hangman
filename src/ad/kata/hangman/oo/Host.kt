@@ -8,10 +8,14 @@ interface Host {
 }
 
 class ComputerHost(
-    private val secretWord: SecretWord
+    chooseWord: () -> Word
 ) : Host {
 
-    constructor(word: Word) : this(word.toSecret())
+    constructor(word: Word) : this(chooseWord = { word })
+
+    constructor(words: Words) : this(words::random)
+
+    private val secretWord by lazy { chooseWord().toSecret() }
 
     override fun obscuredWord() = secretWord.asObscuredWord()
 

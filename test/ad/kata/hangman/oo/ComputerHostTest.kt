@@ -3,6 +3,7 @@ package ad.kata.hangman.oo
 import ad.kata.hangman.ArrowSeparatedStrings
 import ad.kata.hangman.shuffle
 import ad.kata.hangman.take
+import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -10,6 +11,20 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class ComputerHostTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
+    fun `can select a random word from words`(randomWord: Word) {
+        assertThat(
+            ComputerHost(
+                WordList(listOf(randomWord))
+            ).take(
+                randomWord.toMinimalGuesses()
+            ).last()
+        ).isEqualTo(
+            randomWord
+        )
+    }
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
