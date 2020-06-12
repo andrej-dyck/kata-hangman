@@ -4,6 +4,7 @@ import ad.kata.hangman.kotlinExtensions.takeWithFirst
 import java.io.PrintStream
 
 interface Host {
+    fun obscuredWord(): Word
     fun take(guesses: Guesses): Sequence<Word>
 }
 
@@ -13,10 +14,12 @@ class ComputerHost(
 
     constructor(word: Word) : this(word.toSecret())
 
+    override fun obscuredWord() = secretWord.asObscuredWord()
+
     override fun take(guesses: Guesses): Sequence<Word> {
         val guessed = mutableListOf<Char>()
 
-        return sequenceOf(secretWord.asObscuredWord()) + guesses
+        return guesses
             .map {
                 guessed.add(it)
                 secretWord.reveal(guessed)

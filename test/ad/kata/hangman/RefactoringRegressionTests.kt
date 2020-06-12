@@ -54,7 +54,6 @@ class RefactoringRegressionTests {
         assertThat(
             ComputerHost(word)
                 .take(PlayerGuesses(guesses))
-                .drop(1) // in procedural solution, first all-? word isn't shown
                 .map { it.toString() }
                 .toList()
         ).containsExactlyElementsOf(
