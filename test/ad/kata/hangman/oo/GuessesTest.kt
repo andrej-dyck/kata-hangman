@@ -6,10 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.OutputStream
 
-abstract class GuessesTest {
+class GuessesTest {
 
     @Test
     fun `next is the first character from the input`() {
@@ -29,11 +27,6 @@ abstract class GuessesTest {
         )
     }
 
-    abstract fun guesses(vararg input: Char): Guesses
-}
-
-class PlayerGuessesTest : GuessesTest() {
-
     @ParameterizedTest
     @CsvSource(
         "a,a",
@@ -52,19 +45,6 @@ class PlayerGuessesTest : GuessesTest() {
     }
 
     @Test
-    fun `prints input request before next`() {
-        val out = ByteArrayOutputStream()
-
-        guesses(out).firstOrNull()
-
-        assertThat(
-            out.toString()
-        ).startsWith(
-            "Guess a letter: "
-        )
-    }
-
-    @Test
     fun `empty lines do not count as input`() {
         assertThat(
             guesses("", "", "", "a").first()
@@ -73,15 +53,13 @@ class PlayerGuessesTest : GuessesTest() {
         )
     }
 
-    override fun guesses(vararg input: Char) =
+    private fun guesses(vararg input: Char) =
         guesses(input.toLines())
 
     private fun guesses(vararg input: String) =
-        guesses(ByteArrayOutputStream(), *input)
-
-    private fun guesses(outputStream: OutputStream, vararg input: String) =
-        PlayerGuesses(
-            ByteArrayInputStream(input.toLines(trailingBreak = true).toByteArray()),
-            outputStream
+        Guesses(
+            ByteArrayInputStream(
+                input.toLines(trailingBreak = true).toByteArray()
+            )
         )
 }

@@ -1,7 +1,7 @@
 package ad.kata.hangman
 
 import ad.kata.hangman.oo.ComputerHost
-import ad.kata.hangman.oo.PlayerGuesses
+import ad.kata.hangman.oo.Guesses
 import ad.kata.hangman.oo.Word
 import ad.kata.hangman.oo.toSecret
 import org.assertj.core.api.Assertions.assertThat
@@ -53,7 +53,7 @@ class RefactoringRegressionTests {
 
         assertThat(
             ComputerHost(word)
-                .take(PlayerGuesses(guesses))
+                .take(Guesses(guesses))
                 .map { it.toString() }
                 .toList()
         ).containsExactlyElementsOf(

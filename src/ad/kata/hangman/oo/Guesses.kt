@@ -1,23 +1,17 @@
 package ad.kata.hangman.oo
 
 import java.io.InputStream
-import java.io.OutputStream
-import java.io.PrintStream
 import java.util.*
 
-interface Guesses : Sequence<Char>
+class Guesses(private val sequence: Sequence<Char>) : Sequence<Char> {
 
-class PlayerGuesses(private val sequence: Sequence<Char>) : Guesses {
-
-    constructor(inputStream: InputStream, outputStream: OutputStream)
-            : this(Scanner(inputStream), PrintStream(outputStream))
-
-    constructor(scanner: Scanner, out: PrintStream) : this(
+    constructor(scanner: Scanner) : this(
         sequence = generateSequence {
-            out.print("Guess a letter: ")
             scanner.nextChar()
         }
     )
+
+    constructor(inputStream: InputStream) : this(Scanner(inputStream))
 
     internal constructor(charSequence: CharSequence) : this(charSequence.asSequence())
 

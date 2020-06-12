@@ -1,7 +1,6 @@
 package ad.kata.hangman.oo
 
 import ad.kata.hangman.kotlinExtensions.takeWithFirst
-import java.io.PrintStream
 
 interface Host {
     fun obscuredWord(): Word
@@ -17,15 +16,15 @@ class ComputerHost(
     override fun obscuredWord() = secretWord.asObscuredWord()
 
     override fun take(guesses: Guesses): Sequence<Word> {
-        val guessed = mutableListOf<Char>()
+        val letters = mutableListOf<Char>()
 
         return guesses
             .map {
-                guessed.add(it)
-                secretWord.reveal(guessed)
+                letters.add(it)
+                secretWord.reveal(letters)
             }
             .takeWithFirst {
-                secretWord.isRevealed(guessed)
+                secretWord.isRevealed(letters)
             }
     }
 }

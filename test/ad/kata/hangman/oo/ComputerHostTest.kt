@@ -23,11 +23,11 @@ class ComputerHostTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
     fun `takes guesses until word is revealed`(word: Word) {
-        val guesses = word.toString().shuffle()
+        val letters = word.toString().shuffle()
 
         assertThat(
             ComputerHost(word)
-                .take(PlayerGuesses(guesses))
+                .take(Guesses(letters))
                 .last()
         ).isEqualTo(
             word
@@ -44,7 +44,7 @@ class ComputerHostTest {
     fun `reveals word after each guess`(word: Word, guesses: String, expectedReveals: ArrowSeparatedStrings) {
         assertThat(
             ComputerHost(word)
-                .take(PlayerGuesses(guesses))
+                .take(Guesses(guesses))
                 .map { it.toString() }
                 .toList()
         ).containsExactlyElementsOf(
@@ -56,7 +56,7 @@ class ComputerHostTest {
     fun `with no guesses reveals nothing`() {
         assertThat(
             ComputerHost(Word("something"))
-                .take(PlayerGuesses(emptySequence()))
+                .take(Guesses(emptySequence()))
                 .toList()
         ).isEmpty()
     }
