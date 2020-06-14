@@ -5,7 +5,6 @@ import ad.kata.hangman.shuffle
 import ad.kata.hangman.take
 import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -20,7 +19,7 @@ class ComputerHostTest {
                 WordList(listOf(randomWord))
             ).take(
                 randomWord.toMinimalGuesses()
-            ).last()
+            ).last().revealedWord
         ).isEqualTo(
             randomWord
         )
@@ -45,6 +44,7 @@ class ComputerHostTest {
             ComputerHost(word)
                 .take(guesses)
                 .last()
+                .revealedWord
         ).isEqualTo(
             word
         )
@@ -61,7 +61,7 @@ class ComputerHostTest {
         assertThat(
             ComputerHost(word)
                 .take(guesses)
-                .map { it.toString() }
+                .map { it.revealedWord.toString() }
                 .toList()
         ).containsExactlyElementsOf(
             expectedReveals.toList()

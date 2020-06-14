@@ -54,7 +54,7 @@ class RefactoringRegressionTests {
         assertThat(
             ComputerHost(word)
                 .take(guesses)
-                .map { it.toString() }
+                .map { it.revealedWord.toString() }
                 .toList()
         ).containsExactlyElementsOf(
             proceduralExec(word.toString(), guesses)

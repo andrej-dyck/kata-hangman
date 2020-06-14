@@ -19,8 +19,8 @@ class VerboseHost(
     private fun askFor(guesses: Guesses) = Guesses(
         generateSequence {
             out.print("Guess a letter: ")
-        }.zip(guesses).map {
-            it.second
+        }.zip(guesses).map { (_, guess) ->
+            guess
         }
     )
 
@@ -28,5 +28,9 @@ class VerboseHost(
         out.println()
         out.println("The word: $word")
         out.println()
+    }
+
+    private fun print(event: GameEvent) {
+        print(event.revealedWord)
     }
 }

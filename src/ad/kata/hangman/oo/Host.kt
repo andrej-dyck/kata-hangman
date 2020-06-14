@@ -1,10 +1,11 @@
 package ad.kata.hangman.oo
 
+import ad.kata.hangman.kotlinExtensions.runningFold
 import ad.kata.hangman.kotlinExtensions.takeWithFirst
 
 interface Host {
     fun obscuredWord(): Word
-    fun take(guesses: Guesses): Sequence<Word>
+    fun take(guesses: Guesses): Sequence<GameEvent>
 }
 
 class ComputerHost(
@@ -19,16 +20,12 @@ class ComputerHost(
 
     override fun obscuredWord() = secretWord.asObscuredWord()
 
-    override fun take(guesses: Guesses): Sequence<Word> {
-        val letters = mutableListOf<Char>()
-
-        return guesses
-            .map {
-                letters.add(it)
-                secretWord.reveal(letters)
-            }
-            .takeWithFirst {
-                secretWord.isRevealed(letters)
-            }
-    }
+    override fun take(guesses: Guesses) =
+        guesses.runningFold(
+            GameStarted(secretWord) as GameEvent
+        ) { event: GameEvent, guess: Char ->
+            event.takeOr(guess) { throw IllegalStateException() }
+        }.takeWithFirst {
+            it is GameOver
+        }.drop(1) // ignore game started for now
 }

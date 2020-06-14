@@ -68,7 +68,7 @@ class VerboseHostTest {
                 .filter { it.startsWith("Guess a letter: ") }
                 .size
         ).`as`("number of prompts for $word").isEqualTo(
-            minimalGuesses.toSet().size
+            minimalGuesses.count()
         )
     }
 
