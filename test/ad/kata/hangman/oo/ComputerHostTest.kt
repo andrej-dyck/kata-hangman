@@ -1,7 +1,6 @@
 package ad.kata.hangman.oo
 
 import ad.kata.hangman.ArrowSeparatedStrings
-import ad.kata.hangman.shuffle
 import ad.kata.hangman.take
 import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
@@ -27,9 +26,12 @@ class ComputerHostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `can show secret all-? word`(word: Word) {
+    fun `shows secret all-? word as first event`(word: Word) {
         assertThat(
-            ComputerHost(word).obscuredWord()
+            ComputerHost(word)
+                .take(emptySequence())
+                .first()
+                .revealedWord
         ).isEqualTo(
             word.toSecret().asObscuredWord()
         )
@@ -38,7 +40,7 @@ class ComputerHostTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
     fun `takes guesses until word is revealed`(word: Word) {
-        val guesses = word.toString().shuffle()
+        val guesses = word.toMinimalGuesses()
 
         assertThat(
             ComputerHost(word)
@@ -61,20 +63,12 @@ class ComputerHostTest {
         assertThat(
             ComputerHost(word)
                 .take(guesses)
+                .drop(1) // ignore game-started reveal of the word
                 .map { it.revealedWord.toString() }
                 .toList()
         ).containsExactlyElementsOf(
             expectedReveals.toList()
         )
-    }
-
-    @Test
-    fun `with no guesses reveals nothing`() {
-        assertThat(
-            ComputerHost(Word("something"))
-                .take(guesses = emptySequence())
-                .toList()
-        ).isEmpty()
     }
 }
 

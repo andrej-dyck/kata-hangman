@@ -1,9 +1,6 @@
 package ad.kata.hangman
 
-import ad.kata.hangman.oo.ComputerHost
-import ad.kata.hangman.oo.Guesses
-import ad.kata.hangman.oo.Word
-import ad.kata.hangman.oo.toSecret
+import ad.kata.hangman.oo.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -39,8 +36,7 @@ class RefactoringRegressionTests {
                 .reveal(guesses.toCharArray())
                 .toString()
         ).isEqualTo(
-            proceduralExec(word.toString(), guesses)
-                .lines()
+            proceduralExec(word, guesses)
                 .last { it.startsWith("The word: ") }
                 .removePrefix("The word: ")
         )
@@ -51,39 +47,62 @@ class RefactoringRegressionTests {
     fun `host reveals secret word after guesses`(word: Word) {
         val guesses = word.toMinimalGuesses()
 
-        assertThat(
-            ComputerHost(word)
-                .take(guesses)
-                .map { it.revealedWord.toString() }
-                .toList()
-        ).containsExactlyElementsOf(
-            proceduralExec(word.toString(), guesses)
-                .lines()
+        fun wordReveals(outputLines: List<String>) =
+            outputLines
                 .filter { it.startsWith("The word: ") }
                 .map { it.removePrefix("The word: ") }
+
+        assertThat(
+            wordReveals(ooExec(word, guesses))
+                .drop(1) // procedural version does not show first all-? word
+        ).containsExactlyElementsOf(
+            wordReveals(proceduralExec(word, guesses))
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["hangman", "book", "elegant", "objects"])
+    fun `gives feedback on hit or miss after each guess`(word: Word) {
+        val guesses = word.toMinimalGuesses()
+
+        fun hitsAndMisses(outputLines: List<String>) =
+            outputLines
+                .filter { it.contains("Hit") || it.contains("Missed") }
+                .map { if (it.contains("Hit")) "Hit" else "Missed" }
+
+        assertThat(
+            hitsAndMisses(ooExec(word, guesses))
+        ).containsExactlyElementsOf(
+            hitsAndMisses(proceduralExec(word, guesses))
         )
     }
 }
 
-private fun proceduralExec(word: String, guesses: Guesses) =
-    proceduralExec(word, Int.MAX_VALUE, *guesses.toList().toCharArray())
+private fun proceduralExec(word: Word, guesses: Guesses) =
+    proceduralExec(word, guesses.toList().toCharArray())
 
-private fun proceduralExec(word: String, guesses: String) =
-    proceduralExec(word, Int.MAX_VALUE, *guesses.toCharArray())
+private fun proceduralExec(word: Word, guesses: String) =
+    proceduralExec(word, guesses.toCharArray())
 
-private fun proceduralExec(word: String, vararg inputChars: Char) =
-    proceduralExec(word, Int.MAX_VALUE, *inputChars)
-
-private fun proceduralExec(word: String, maxMistakes: Int, vararg inputChars: Char) =
+private fun proceduralExec(word: Word, inputChars: CharArray, maxMistakes: Int = Int.MAX_VALUE) =
     ByteArrayOutputStream().use { output ->
         ProceduralHangman(
             ByteArrayInputStream(
                 inputChars.toLines(trailingBreak = true).toByteArray()
             ),
             output,
-            arrayOf(word),
+            arrayOf(word.toString()),
             maxMistakes
         ).exec()
 
         output.toString()
-    }
+    }.nonEmptyLines()
+
+private fun ooExec(word: Word, guesses: Guesses, maxMistakes: Int = Int.MAX_VALUE) =
+    ByteArrayOutputStream().use { output ->
+        VerboseHost(ComputerHost(word), output)
+            .take(guesses)
+            .toList()
+
+        output.toString()
+    }.nonEmptyLines()

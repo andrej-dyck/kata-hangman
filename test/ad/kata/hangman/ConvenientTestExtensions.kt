@@ -13,8 +13,8 @@ fun <T> Array<T>.toLines(trailingBreak: Boolean = false): String =
 fun CharArray.toLines(trailingBreak: Boolean = false) =
     map { it.toString() }.toLines(trailingBreak)
 
-fun String.shuffle() =
-    toMutableList().also { it.shuffle() }.joinToString("")
+fun CharSequence.nonEmptyLines(): List<String> =
+    lines().filter { it.isNotBlank() }
 
 /* Word */
 

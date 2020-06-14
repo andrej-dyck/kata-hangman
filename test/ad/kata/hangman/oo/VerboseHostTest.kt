@@ -1,6 +1,7 @@
 package ad.kata.hangman.oo
 
 import ad.kata.hangman.ArrowSeparatedStrings
+import ad.kata.hangman.nonEmptyLines
 import ad.kata.hangman.take
 import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
@@ -14,14 +15,17 @@ class VerboseHostTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `prints the obscured word`(word: Word) {
+    fun `shows obscured word before anything else`(word: Word) {
         val verboseHost = verboseHostSpy(word)
 
-        verboseHost.obscuredWord()
+        verboseHost.take(guesses = emptySequence()).toList()
 
         assertThat(
-            verboseHost.nonEmptyLines().first()
-        ).isEqualTo(
+            verboseHost
+                .nonEmptyLines()
+                .take(numberOfGameStartedLines)
+        ).containsExactly(
+            "A new Hangman game",
             "The word: ${word.toSecret().asObscuredWord()}"
         )
     }
@@ -34,24 +38,13 @@ class VerboseHostTest {
         verboseHost.take(guesses = emptySequence()).toList()
 
         assertThat(
-            verboseHost.nonEmptyLines().first()
+            verboseHost
+                .nonEmptyLines()
+                .drop(numberOfGameStartedLines)
+                .first()
         ).startsWith(
             "Guess a letter: "
         )
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `prints nothing but the prompt when no guesses are made`(word: Word) {
-        val verboseHost = verboseHostSpy(word)
-
-        verboseHost.take(guesses = emptySequence()).toList()
-
-        assertThat(
-            verboseHost
-                .nonEmptyLines()
-                .filter { !it.startsWith("Guess a letter: ") }
-        ).isEmpty()
     }
 
     @ParameterizedTest
@@ -88,12 +81,15 @@ class VerboseHostTest {
         assertThat(
             verboseHost
                 .nonEmptyLines()
+                .drop(numberOfGameStartedLines)
                 .filter { it.startsWith("The word: ") }
                 .map { it.removePrefix("The word: ") }
         ).containsExactlyElementsOf(
             expectedReveals.toList()
         )
     }
+
+    private val numberOfGameStartedLines = 2
 
     private fun verboseHostSpy(word: Word) = VerboseHostSpy(word)
 
@@ -105,7 +101,6 @@ class VerboseHostTest {
         out
     ) {
 
-        fun nonEmptyLines(): List<String> =
-            out.toString().lines().filter { it.isNotBlank() }
+        fun nonEmptyLines(): List<String> = out.toString().nonEmptyLines()
     }
 }

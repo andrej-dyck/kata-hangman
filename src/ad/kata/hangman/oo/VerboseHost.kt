@@ -10,13 +10,10 @@ class VerboseHost(
 
     constructor(host: Host, out: OutputStream) : this(host, PrintStream(out))
 
-    override fun obscuredWord() =
-        host.obscuredWord().also(this::print)
-
     override fun take(guesses: Guesses) =
-        host.take(askFor(guesses)).onEach(this::print)
+        host.take(promptFor(guesses)).onEach(this::print)
 
-    private fun askFor(guesses: Guesses) = Guesses(
+    private fun promptFor(guesses: Guesses) = Guesses(
         generateSequence {
             out.print("Guess a letter: ")
         }.zip(guesses).map { (_, guess) ->
@@ -24,13 +21,28 @@ class VerboseHost(
         }
     )
 
-    private fun print(word: Word) {
-        out.println()
-        out.println("The word: $word")
+    private fun print(event: GameEvent) {
+        VerboseGameEvent(event).printOn(out)
         out.println()
     }
+}
 
-    private fun print(event: GameEvent) {
-        print(event.revealedWord)
+class VerboseGameEvent(event: GameEvent) {
+
+    private val feedback by lazy {
+        when (event) {
+            is GameStarted -> "A new Hangman game"
+            is GuessTaken -> if (event.isHit) "Hit!" else "Missed."
+            is GameOver -> if (event.isWin) "Hit! You win!" else "Missed. You lost."
+        }
+    }
+
+    private val revealedWord by lazy {
+        event.revealedWord
+    }
+
+    fun printOn(out: PrintStream) {
+        out.println(feedback)
+        out.println("The word: $revealedWord")
     }
 }

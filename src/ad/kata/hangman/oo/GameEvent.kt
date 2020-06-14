@@ -51,4 +51,7 @@ class GuessTaken private constructor(
         if (isRevealed) GameOver(this) else this
 }
 
-class GameOver(guessTaken: GuessTaken) : HitMissOrOver(guessTaken.secretWord, guessTaken.guessedLetters)
+class GameOver(guessTaken: GuessTaken) : HitMissOrOver(guessTaken.secretWord, guessTaken.guessedLetters) {
+
+    val isWin by lazy { isRevealed }
+}
