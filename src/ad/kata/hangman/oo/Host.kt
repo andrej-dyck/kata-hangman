@@ -7,20 +7,22 @@ interface Host {
     fun take(guesses: Guesses): Sequence<GameEvent>
 }
 
-class ComputerHost(chooseWord: () -> Word) : Host {
+class ComputerHost(
+    private val chooseWord: () -> Word
+) : Host {
 
     constructor(word: Word) : this(chooseWord = { word })
 
     constructor(words: Words) : this(words::random)
 
-    private val secretWord by lazy { chooseWord().toSecret() }
-
     override fun take(guesses: Guesses) =
         guesses.runningFold(
-            GameStarted(secretWord) as GameEvent
+            GameStarted(newSecretWord()) as GameEvent
         ) { event: GameEvent, guess: Char ->
             event.takeOr(guess) { throw IllegalStateException() }
         }.takeWithFirst {
             it is GameOver
         }
+
+    private fun newSecretWord() = chooseWord().toSecret()
 }

@@ -4,6 +4,8 @@ import ad.kata.hangman.ArrowSeparatedStrings
 import ad.kata.hangman.take
 import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -68,6 +70,39 @@ class ComputerHostTest {
                 .toList()
         ).containsExactlyElementsOf(
             expectedReveals.toList()
+        )
+    }
+
+    @Test
+    fun `selects a random word from words each time`() {
+        val word1 = Word("book")
+        val word2 = Word("objects")
+
+        val host = ComputerHost(
+            object : Words {
+                private val words = mutableListOf(word1, word2)
+                override fun random() = words.removeAt(0)
+            }
+        )
+
+        assertAll(
+            {
+                assertThat(
+                    host.take(word1.toMinimalGuesses())
+                        .last()
+                        .revealedWord
+                ).isEqualTo(
+                    word1
+                )
+            }, {
+                assertThat(
+                    host.take(word2.toMinimalGuesses())
+                        .last()
+                        .revealedWord
+                ).isEqualTo(
+                    word2
+                )
+            }
         )
     }
 }
