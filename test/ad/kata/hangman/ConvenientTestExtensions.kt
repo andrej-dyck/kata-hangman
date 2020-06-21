@@ -5,7 +5,7 @@ import ad.kata.hangman.oo.*
 /* Strings and Chars */
 
 fun <T> List<T>.toLines(trailingBreak: Boolean = false): String =
-    joinToString("\n") + (if (trailingBreak) "\n" else "")
+    joinToString("\n") + if (trailingBreak) "\n" else ""
 
 fun <T> Array<T>.toLines(trailingBreak: Boolean = false): String =
     toList().toLines(trailingBreak)

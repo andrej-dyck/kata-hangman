@@ -5,8 +5,10 @@ import ad.kata.hangman.oo.WordList
 import ad.kata.hangman.oo.Hangman as OoHangman
 import ad.kata.hangman.procedural.Hangman as ProceduralHangman
 
+@Suppress("LongMethod")
 fun main() {
     val words = ProceduralHangman.WORDS
+    val maxMisses = 5
 
     if (RELEASE_TOGGLE_OO_VERSION) {
         OoHangman(
@@ -19,7 +21,7 @@ fun main() {
             System.`in`,
             System.out,
             words,
-            5
+            maxMisses
         ).exec()
     }
 }

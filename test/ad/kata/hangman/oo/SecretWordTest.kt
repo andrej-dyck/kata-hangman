@@ -129,7 +129,7 @@ class SecretWordTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
     fun `each letter that is not one of the word is a miss`(word: Word) {
-        val lettersNotInWord = ('a'..'z') subtract word.chars()
+        val lettersNotInWord = 'a'..'z' subtract word.chars()
 
         lettersNotInWord.forEach { letter ->
             assertThat(

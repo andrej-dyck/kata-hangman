@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
     java
     application
+    id("io.gitlab.arturbosch.detekt") version "1.10.0-RC1"
 }
 
 group = "ad.kata.hangman"
@@ -20,6 +21,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
     testImplementation("org.assertj:assertj-core:3.14.0")
+    // static analysis
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.10.0-RC1")
     // needed for IntelliJ
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
@@ -59,6 +62,17 @@ tasks.named<Test>("test") {
     testLogging {
         events("passed", "skipped", "failed")
     }
+}
+
+detekt {
+    toolVersion = "1.10.0-RC1"
+    input = files("src/")
+    config = files("detekt.yml")
+    buildUponDefaultConfig = false
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt> {
+    exclude("**/procedural") // exclude legacy code
 }
 
 application {

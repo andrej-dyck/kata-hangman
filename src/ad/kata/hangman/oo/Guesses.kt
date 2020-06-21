@@ -1,7 +1,7 @@
 package ad.kata.hangman.oo
 
 import java.io.InputStream
-import java.util.*
+import java.util.Scanner
 
 class Guesses(private val sequence: Sequence<Char>) : Sequence<Char> {
 
@@ -17,5 +17,7 @@ class Guesses(private val sequence: Sequence<Char>) : Sequence<Char> {
 }
 
 private tailrec fun Scanner.nextChar(): Char? =
-    if (hasNext()) nextLine().firstOrNull() ?: nextChar()
-    else null
+    hasNext()
+        .takeIf { it }
+        ?.let { nextLine().firstOrNull() }
+        ?: nextChar()
