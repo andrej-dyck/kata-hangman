@@ -79,6 +79,9 @@ class RefactoringRegressionTests {
 }
 
 private fun proceduralExec(word: Word, guesses: Guesses) =
+    proceduralExec(word, guesses.map { it.letter })
+
+private fun proceduralExec(word: Word, guesses: Sequence<Char>) =
     proceduralExec(word, guesses.toList().toCharArray())
 
 private fun proceduralExec(word: Word, guesses: String) =

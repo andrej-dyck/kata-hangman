@@ -18,7 +18,7 @@ class ComputerHost(
     override fun take(guesses: Guesses) =
         guesses.runningFold(
             GameStarted(newSecretWord()) as GameEvent
-        ) { event: GameEvent, guess: Char ->
+        ) { event: GameEvent, guess: Guess ->
             event.takeOr(guess) { throw IllegalStateException() }
         }.takeWithFirst {
             it is GameOver

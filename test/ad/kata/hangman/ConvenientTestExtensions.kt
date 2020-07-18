@@ -21,7 +21,7 @@ fun CharSequence.nonEmptyLines(): List<String> =
 operator fun Word.contains(char: Char) = char in toString()
 
 fun Word.toMinimalGuesses() = Guesses(
-    chars().shuffled().asSequence()
+    chars().shuffled().asSequence().map { Guess(it) }
 )
 
 /* Secret Word */
@@ -33,9 +33,9 @@ fun SecretWord.length() = asObscuredWord().length()
 /* Host */
 
 fun Host.take(guesses: CharSequence) =
-    take(guesses.asSequence())
+    take(guesses.asSequence().map { Guess(it) })
 
-fun Host.take(guesses: Sequence<Char>) =
+fun Host.take(guesses: Sequence<Guess>) =
     take(Guesses(guesses))
 
 /* Parameterized Test Arguments */

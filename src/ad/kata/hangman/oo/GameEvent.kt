@@ -5,47 +5,49 @@ sealed class GameEvent {
     abstract val revealedWord: Word
 }
 
-class GameStarted(private val secretWord: SecretWord) : GameEvent(), TakesGuess {
+class GameStarted(
+    private val secretWord: SecretWord
+) : GameEvent(), TakesGuess {
 
     override val revealedWord by lazy { secretWord.asObscuredWord() }
 
-    override fun take(guess: Char) = GuessTaken(secretWord, guess).maybeGameOver()
+    override fun take(guess: Guess) = GuessTaken(secretWord, guess).maybeGameOver()
 }
 
 interface TakesGuess {
 
-    fun take(guess: Char): HitMissOrOver
+    fun take(guess: Guess): HitMissOrOver
 }
 
-fun GameEvent.takeOr(guess: Char, otherwise: () -> GameEvent) = when (this) {
+fun GameEvent.takeOr(guess: Guess, otherwise: () -> GameEvent) = when (this) {
     is TakesGuess -> take(guess)
     else -> otherwise()
 }
 
 sealed class HitMissOrOver(
     internal val secretWord: SecretWord,
-    internal val guessedLetters: List<Char>
+    internal val guesses: List<Guess>
 ) : GameEvent() {
 
     init {
-        require(guessedLetters.isNotEmpty())
+        require(guesses.isNotEmpty())
     }
 
-    override val revealedWord by lazy { secretWord.reveal(guessedLetters) }
+    override val revealedWord by lazy { secretWord.revealWith(guesses) }
 
-    val isHit by lazy { secretWord.isHit(guessedLetters.last()) }
-    val isRevealed by lazy { secretWord.isRevealed(guessedLetters) }
+    val isHit by lazy { secretWord.isHitWith(guesses.last()) }
+    val isRevealed by lazy { secretWord.isRevealedWith(guesses) }
 }
 
 class GuessTaken private constructor(
     secretWord: SecretWord,
-    guessedLetters: List<Char>
-) : HitMissOrOver(secretWord, guessedLetters), TakesGuess {
+    guesses: List<Guess>
+) : HitMissOrOver(secretWord, guesses), TakesGuess {
 
-    constructor(secretWord: SecretWord, guess: Char) : this(secretWord, listOf(guess))
+    constructor(secretWord: SecretWord, guess: Guess) : this(secretWord, listOf(guess))
 
-    override fun take(guess: Char): HitMissOrOver =
-        GuessTaken(secretWord, guessedLetters + guess).maybeGameOver()
+    override fun take(guess: Guess): HitMissOrOver =
+        GuessTaken(secretWord, guesses + guess).maybeGameOver()
 
     fun maybeGameOver(): HitMissOrOver =
         if (isRevealed) GameOver(this) else this
@@ -53,7 +55,7 @@ class GuessTaken private constructor(
 
 class GameOver(
     guessTaken: GuessTaken
-) : HitMissOrOver(guessTaken.secretWord, guessTaken.guessedLetters) {
+) : HitMissOrOver(guessTaken.secretWord, guessTaken.guesses) {
 
     val isWin by lazy { isRevealed }
 }

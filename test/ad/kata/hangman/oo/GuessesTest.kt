@@ -61,5 +61,7 @@ class GuessesTest {
             ByteArrayInputStream(
                 input.toLines(trailingBreak = true).toByteArray()
             )
-        )
+        ).map {
+            it.letter
+        }
 }

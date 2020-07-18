@@ -17,6 +17,12 @@ class SecretWord(private val word: Word, private val hidden: Char = '?') {
 fun Word.toSecret() = SecretWord(this)
 
 fun SecretWord.asObscuredWord() = reveal(emptySet())
+
 fun SecretWord.reveal(letters: List<Char>) = reveal(letters.toHashSet())
+fun SecretWord.revealWith(guesses: List<Guess>) = reveal(guesses.map { it.letter })
+
 fun SecretWord.isRevealed(letters: List<Char>) = isRevealed(letters.toHashSet())
+fun SecretWord.isRevealedWith(guesses: List<Guess>) = isRevealed(guesses.map { it.letter })
+
+fun SecretWord.isHitWith(guess: Guess) = isHit(guess.letter)
 fun SecretWord.isMiss(letter: Char) = !isHit(letter)
