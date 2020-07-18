@@ -73,6 +73,30 @@ class ComputerHostTest {
         )
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "hangman, 1, hxanmg, h?????? -> h??????",
+        "book, 2, xobxk, ???? -> ?oo? -> boo? -> boo?",
+        "elegant, 3, exlxgxnta, e?e???? -> e?e???? -> ele???? -> ele???? -> eleg??? -> eleg???",
+        "objects, 5, xxxxx, ??????? -> ??????? -> ??????? -> ??????? -> ???????"
+    )
+    fun `takes guesses until attempts are exhausted`(
+        word: Word,
+        maxMisses: Int,
+        guesses: String,
+        expectedReveals: ArrowSeparatedStrings
+    ) {
+        assertThat(
+            ComputerHost(word)
+                .take(guesses, maxMisses)
+                .drop(1) // ignore game-started reveal of the word
+                .map { it.revealedWord.toString() }
+                .toList()
+        ).containsExactlyElementsOf(
+            expectedReveals.toList()
+        )
+    }
+
     @Test
     fun `selects a random word from words each time`() {
         val word1 = Word("book")

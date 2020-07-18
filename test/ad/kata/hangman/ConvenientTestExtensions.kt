@@ -1,6 +1,15 @@
 package ad.kata.hangman
 
-import ad.kata.hangman.oo.*
+import ad.kata.hangman.oo.Guess
+import ad.kata.hangman.oo.Guesses
+import ad.kata.hangman.oo.HitOrMiss
+import ad.kata.hangman.oo.Host
+import ad.kata.hangman.oo.MaxMisses
+import ad.kata.hangman.oo.Misses
+import ad.kata.hangman.oo.SecretWord
+import ad.kata.hangman.oo.Word
+import ad.kata.hangman.oo.asObscuredWord
+import ad.kata.hangman.oo.chars
 
 /* Strings and Chars */
 
@@ -35,10 +44,21 @@ fun SecretWord.length() = asObscuredWord().length()
 fun Host.take(guesses: CharSequence) =
     take(guesses.asSequence().map { Guess(it) })
 
+fun Host.take(guesses: CharSequence, maxMisses: Int) =
+    take(guesses.asSequence().map { Guess(it) }, maxMisses)
+
 fun Host.take(guesses: Sequence<Guess>) =
-    take(Guesses(guesses))
+    take(guesses, IGNORE_MISSES)
+
+fun Host.take(guesses: Sequence<Guess>, maxMisses: Int) =
+    take(guesses, MaxMisses(maxMisses))
+
+fun Host.take(guesses: Sequence<Guess>, maxMisses: MaxMisses) =
+    take(Guesses(guesses), maxMisses)
 
 /* Misses */
+
+val IGNORE_MISSES = MaxMisses(Int.MAX_VALUE)
 
 fun missesWithCount(count: Int, maxMisses: Int = 1) =
     missesWithCount(count, MaxMisses(maxMisses).startCounting())

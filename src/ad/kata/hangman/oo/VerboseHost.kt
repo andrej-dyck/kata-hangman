@@ -10,8 +10,8 @@ class VerboseHost(
 
     constructor(host: Host, out: OutputStream) : this(host, PrintStream(out))
 
-    override fun take(guesses: Guesses) =
-        host.take(promptFor(guesses)).onEach(this::print)
+    override fun take(guesses: Guesses, maxMisses: MaxMisses) =
+        host.take(promptFor(guesses), maxMisses).onEach(this::print)
 
     private fun promptFor(guesses: Guesses) = Guesses(
         generateSequence {
@@ -31,8 +31,11 @@ class VerboseGameEvent(event: GameEvent) {
 
     private val feedback by lazy {
         when (event) {
-            is GameStarted -> "A new Hangman game"
-            is GuessTaken -> if (event.isHit) "Hit!" else "Missed."
+            is GameStarted -> "A new Hangman game. Max mistakes allowed: ${event.maxMissesAllowed}"
+            is GuessTaken -> when (val it = event.hitOrMiss) {
+                is Hit -> "Hit!"
+                is Miss -> "Missed, mistake #${it.numberOfMisses} out of ${it.maxMissesAllowed}."
+            }
             is GameOver -> if (event.isWin) "Hit! You win!" else "Missed. You lost."
         }
     }
@@ -46,3 +49,12 @@ class VerboseGameEvent(event: GameEvent) {
         out.println("The word: $revealedWord")
     }
 }
+
+internal val GameStarted.maxMissesAllowed
+    get() = maxMisses.value
+
+internal val HitOrMiss.numberOfMisses
+    get() = misses.count
+
+internal val HitOrMiss.maxMissesAllowed
+    get() = misses.maxMisses.value

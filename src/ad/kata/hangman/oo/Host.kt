@@ -4,7 +4,7 @@ import ad.kata.hangman.kotlinExtensions.runningFold
 import ad.kata.hangman.kotlinExtensions.takeWithFirst
 
 interface Host {
-    fun take(guesses: Guesses): Sequence<GameEvent>
+    fun take(guesses: Guesses, maxMisses: MaxMisses): Sequence<GameEvent>
 }
 
 class ComputerHost(
@@ -15,11 +15,11 @@ class ComputerHost(
 
     constructor(words: Words) : this(words::random)
 
-    override fun take(guesses: Guesses) =
+    override fun take(guesses: Guesses, maxMisses: MaxMisses) =
         guesses.runningFold(
-            GameStarted(newSecretWord()) as GameEvent
+            GameStarted(newSecretWord(), maxMisses) as GameEvent
         ) { event: GameEvent, guess: Guess ->
-            event.takeOr(guess) { throw IllegalStateException() }
+            event.takeOr(guess) { throw IllegalStateException("game over") }
         }.takeWithFirst {
             it is GameOver
         }

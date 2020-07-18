@@ -1,6 +1,12 @@
 package ad.kata.hangman
 
-import ad.kata.hangman.oo.*
+import ad.kata.hangman.oo.ComputerHost
+import ad.kata.hangman.oo.Guess
+import ad.kata.hangman.oo.Guesses
+import ad.kata.hangman.oo.MaxMisses
+import ad.kata.hangman.oo.VerboseHost
+import ad.kata.hangman.oo.Word
+import ad.kata.hangman.oo.toSecret
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -47,11 +53,6 @@ class RefactoringRegressionTests {
     fun `host reveals secret word after guesses`(word: Word) {
         val guesses = word.toMinimalGuesses()
 
-        fun wordReveals(outputLines: List<String>) =
-            outputLines
-                .filter { it.startsWith("The word: ") }
-                .map { it.removePrefix("The word: ") }
-
         assertThat(
             wordReveals(ooExec(word, guesses))
                 .drop(1) // procedural version does not show first all-? word
@@ -60,20 +61,41 @@ class RefactoringRegressionTests {
         )
     }
 
+    private fun wordReveals(outputLines: List<String>) =
+        outputLines
+            .filter { it.startsWith("The word: ") }
+            .map { it.removePrefix("The word: ") }
+
     @ParameterizedTest
     @ValueSource(strings = ["hangman", "book", "elegant", "objects"])
     fun `gives feedback on hit or miss after each guess`(word: Word) {
         val guesses = word.toMinimalGuesses()
 
-        fun hitsAndMisses(outputLines: List<String>) =
-            outputLines
-                .filter { it.contains("Hit") || it.contains("Missed") }
-                .map { if (it.contains("Hit")) "Hit" else "Missed" }
-
         assertThat(
             hitsAndMisses(ooExec(word, guesses))
         ).containsExactlyElementsOf(
             hitsAndMisses(proceduralExec(word, guesses))
+        )
+    }
+
+    private fun hitsAndMisses(outputLines: List<String>) =
+        outputLines
+            .filter { it.contains("Hit") || it.contains("Missed") }
+            .map { if (it.contains("Hit")) "Hit" else "Missed" }
+
+    @ParameterizedTest
+    @CsvSource(
+        "hangman, 1, anx",
+        "book, 5, eokb",
+        "elegant, 3, engitkm",
+        "objects, 5, xxxxx"
+    )
+    fun `plays hangman until word is revealed or attempts are exhausted`(word: Word, maxMisses: Int, guesses: String) {
+        assertThat(
+            wordReveals(ooExec(word, guesses, maxMisses))
+                .drop(1) // procedural version does not show first all-? word
+        ).containsExactlyElementsOf(
+            wordReveals(proceduralExec(word, guesses, maxMisses))
         )
     }
 }
@@ -87,7 +109,10 @@ private fun proceduralExec(word: Word, guesses: Sequence<Char>) =
 private fun proceduralExec(word: Word, guesses: String) =
     proceduralExec(word, guesses.toCharArray())
 
-private fun proceduralExec(word: Word, inputChars: CharArray, maxMistakes: Int = Int.MAX_VALUE) =
+private fun proceduralExec(word: Word, guesses: String, maxMisses: Int) =
+    proceduralExec(word, guesses.toCharArray(), maxMisses)
+
+private fun proceduralExec(word: Word, inputChars: CharArray, maxMisses: Int = Int.MAX_VALUE) =
     ByteArrayOutputStream().use { output ->
         ProceduralHangman(
             ByteArrayInputStream(
@@ -95,16 +120,19 @@ private fun proceduralExec(word: Word, inputChars: CharArray, maxMistakes: Int =
             ),
             output,
             arrayOf(word.toString()),
-            maxMistakes
+            maxMisses
         ).exec()
 
         output.toString()
     }.nonEmptyLines()
 
-private fun ooExec(word: Word, guesses: Guesses, maxMistakes: Int = Int.MAX_VALUE) =
+private fun ooExec(word: Word, guesses: String, maxMisses: Int) =
+    ooExec(word, Guesses(guesses.toCharArray().asSequence().map { Guess(it) }), MaxMisses(maxMisses))
+
+private fun ooExec(word: Word, guesses: Guesses, maxMisses: MaxMisses = IGNORE_MISSES) =
     ByteArrayOutputStream().use { output ->
         VerboseHost(ComputerHost(word), output)
-            .take(guesses)
+            .take(guesses, maxMisses)
             .toList()
 
         output.toString()

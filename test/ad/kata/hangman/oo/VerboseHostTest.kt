@@ -5,6 +5,7 @@ import ad.kata.hangman.nonEmptyLines
 import ad.kata.hangman.take
 import ad.kata.hangman.toMinimalGuesses
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -13,9 +14,40 @@ import java.io.OutputStream
 
 class VerboseHostTest {
 
+    @Test
+    fun `starts by telling its a new game`() {
+        val verboseHost = verboseHostSpy(Word("word"))
+
+        verboseHost.take(guesses = emptySequence()).toList()
+
+        assertThat(
+            verboseHost
+                .nonEmptyLines()
+                .first()
+        ).startsWith(
+            "A new Hangman game"
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [1, 2, 5, 7])
+    fun `starts by telling max allowed misses`(maxMisses: Int) {
+        val verboseHost = verboseHostSpy(Word("word"))
+
+        verboseHost.take(guesses = emptySequence(), maxMisses = maxMisses).toList()
+
+        assertThat(
+            verboseHost
+                .nonEmptyLines()
+                .first()
+        ).endsWith(
+            "Max mistakes allowed: $maxMisses"
+        )
+    }
+
     @ParameterizedTest
     @ValueSource(strings = ["a", "book", "called", "elegant", "objects"])
-    fun `shows obscured word before anything else`(word: Word) {
+    fun `shows obscured word as the last introduction line`(word: Word) {
         val verboseHost = verboseHostSpy(word)
 
         verboseHost.take(guesses = emptySequence()).toList()
@@ -24,8 +56,8 @@ class VerboseHostTest {
             verboseHost
                 .nonEmptyLines()
                 .take(numberOfGameStartedLines)
-        ).containsExactly(
-            "A new Hangman game",
+                .last()
+        ).isEqualTo(
             "The word: ${word.toSecret().asObscuredWord()}"
         )
     }
@@ -86,6 +118,54 @@ class VerboseHostTest {
                 .map { it.removePrefix("The word: ") }
         ).containsExactlyElementsOf(
             expectedReveals.toList()
+        )
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "hangman, hxanmxg, Hit -> Missed -> Hit -> Hit -> Hit -> Missed -> Hit",
+        "book, xoxbk, Missed -> Hit -> Missed -> Hit -> Hit"
+    )
+    fun `gives feedback after each guess`(word: Word, guesses: String, expectedHitsAndMisses: ArrowSeparatedStrings) {
+
+        val verboseHost = verboseHostSpy(word)
+
+        verboseHost.take(guesses).toList()
+
+        assertThat(
+            verboseHost
+                .nonEmptyLines()
+                .map { it.removePrefix("Guess a letter: ") }
+                .filter { it.startsWith("Hit") || it.startsWith("Missed") }
+                .map { if (it.startsWith("Hit")) "Hit" else "Missed" }
+        ).containsExactlyElementsOf(
+            expectedHitsAndMisses.toList()
+        )
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "hangman, 5, xxx, mistake #1 out of 5 -> mistake #2 out of 5 -> mistake #3 out of 5",
+        "book, 2, x, mistake #1 out of 2"
+    )
+    fun `gives feedback about count and max mistakes allowed after each miss`(
+        word: Word,
+        maxMisses: Int,
+        guesses: String,
+        expectedHitsAndMisses: ArrowSeparatedStrings
+    ) {
+        val verboseHost = verboseHostSpy(word)
+
+        verboseHost.take(guesses, maxMisses).toList()
+
+        assertThat(
+            verboseHost
+                .nonEmptyLines()
+                .map { it.removePrefix("Guess a letter: ") }
+                .filter { it.startsWith("Missed") }
+                .map { it.removePrefix("Missed").trim(' ', ',', '.') }
+        ).containsExactlyElementsOf(
+            expectedHitsAndMisses.toList()
         )
     }
 

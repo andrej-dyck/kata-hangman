@@ -5,15 +5,20 @@ import java.io.PrintStream
 
 class Hangman(
     private val words: Words,
+    private val maxMisses: MaxMisses,
     private val inputStream: InputStream,
     private val out: PrintStream
 ) {
+
+    constructor(words: Words, maxMisses: Int, inputStream: InputStream, out: PrintStream) :
+        this(words, MaxMisses(maxMisses), inputStream, out)
 
     fun exec() =
         VerboseHost(
             ComputerHost(words),
             out
         ).take(
-            Guesses(inputStream)
+            Guesses(inputStream),
+            maxMisses
         ).toList()
 }

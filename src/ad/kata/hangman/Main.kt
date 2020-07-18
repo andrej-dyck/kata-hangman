@@ -13,6 +13,7 @@ fun main() {
     if (RELEASE_TOGGLE_OO_VERSION) {
         OoHangman(
             WordList(words?.map { Word(it) } ?: emptyList()),
+            maxMisses,
             System.`in`,
             System.out
         ).exec()
