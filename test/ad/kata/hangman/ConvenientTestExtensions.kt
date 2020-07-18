@@ -38,6 +38,17 @@ fun Host.take(guesses: CharSequence) =
 fun Host.take(guesses: Sequence<Guess>) =
     take(Guesses(guesses))
 
+/* Misses */
+
+fun missesWithCount(count: Int, maxMisses: Int = 1) =
+    missesWithCount(count, MaxMisses(maxMisses).startCounting())
+
+private tailrec fun missesWithCount(count: Int, misses: Misses): Misses =
+    if (count <= 0) misses else missesWithCount(count - 1, misses.withAnotherMiss())
+
+operator fun HitOrMiss.Companion.invoke(secretWord: SecretWord, guess: Guess) =
+    invoke(secretWord, guess, MaxMisses(1).startCounting())
+
 /* Parameterized Test Arguments */
 
 class ArrowSeparatedStrings(private val list: List<String>) {
