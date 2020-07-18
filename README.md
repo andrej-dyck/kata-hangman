@@ -16,6 +16,12 @@ Build it:
 $ ./gradlew build
 ```
 
+Analyse it:
+
+```
+$ ./gradlew detekt
+```
+
 Test it:
 
 ```

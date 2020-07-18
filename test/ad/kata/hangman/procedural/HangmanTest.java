@@ -15,7 +15,7 @@ public final class HangmanTest {
             "a\na\na\na\na\n".getBytes()
         );
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new Hangman(input, output, 1).exec();
+        new Hangman(input, output, Hangman.WORDS, 1).exec();
         assertThat(output.toString()).contains("You lost");
     }
 }
